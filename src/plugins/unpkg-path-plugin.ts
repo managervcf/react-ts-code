@@ -1,51 +1,33 @@
 import * as esbuild from 'esbuild-wasm';
-import axios from 'axios';
 
 export const unpkgPathPlugin = () => {
   return {
     name: 'unpkg-path-plugin',
     setup(build: esbuild.PluginBuild) {
-      build.onResolve({ filter: /.*/ }, async (args: any) => {
-        console.log('onResolve', args);
-        if (args.path === 'index.js') {
-          return { path: args.path, namespace: 'a' };
-        }
-        if (args.path.includes('./') || args.path.includes('../')) {
-          return {
-            namespace: 'a',
-            path: new URL(args.path, `https://unpkg.com${args.resolveDir}/`)
-              .href,
-          };
-        }
+      /**
+       * Handle the root entry file of `index.js`.
+       */
+      build.onResolve({ filter: /(^index\.js$)/ }, () => {
+        return { path: 'index.js', namespace: 'a' };
+      });
 
+      /**
+       * Handle relative paths in an imported module.
+       */
+      build.onResolve({ filter: /^\.+\// }, (args: any) => {
         return {
           namespace: 'a',
-          path: `https://unpkg.com/${args.path}`,
+          path: new URL(args.path, `https://unpkg.com${args.resolveDir}/`).href,
         };
       });
 
-      build.onLoad({ filter: /.*/ }, async (args: any) => {
-        console.log('onLoad', args);
-
-        if (args.path === 'index.js') {
-          return {
-            loader: 'jsx',
-            contents: `
-              import React from 'react';
-              console.log(React);
-            `,
-          };
-        }
-
-        const { data, request } = await axios.get(args.path);
-
-        console.log(data);
-        console.log(request);
-
+      /**
+       * Handle main file in an imported module.
+       */
+      build.onResolve({ filter: /.*/ }, async (args: esbuild.OnResolveArgs) => {
         return {
-          loader: 'jsx',
-          contents: data,
-          resolveDir: new URL('./', request.responseURL).pathname,
+          namespace: 'a',
+          path: `https://unpkg.com/${args.path}`,
         };
       });
     },
