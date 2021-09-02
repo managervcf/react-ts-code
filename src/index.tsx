@@ -35,7 +35,14 @@ const App = () => {
       },
     });
 
-    setCode(result.outputFiles[0].text);
+    const outputCode = result.outputFiles[0].text;
+    setCode(outputCode);
+
+    try {
+      eval(outputCode);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -49,6 +56,7 @@ const App = () => {
         <button onClick={onClick}>Submit</button>
       </div>
       <pre>{code}</pre>
+      <iframe src="/test.html" sandbox=""></iframe>
     </div>
   );
 };

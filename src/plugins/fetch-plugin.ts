@@ -10,12 +10,12 @@ export const fetchPlugin = (inputCode: string) => {
   return {
     name: 'fetch-plugin',
     setup(build: esbuild.PluginBuild) {
-      // Handles the caching logic, retrieves a cached object.
+      /**
+       * Handles the caching logic, retrieves a cached object.
+       */
       build.onLoad({ filter: /.*/ }, async (args: esbuild.OnLoadArgs) => {
-        /**
-         * Check to see if we have already fetched this file
-         * and if it is in the cache.
-         */
+        // Check to see if we have already fetched this file
+        // and if it is in the cache.
         const cachedResult = await fileCache.getItem<esbuild.OnLoadResult>(
           args.path
         );
@@ -26,7 +26,9 @@ export const fetchPlugin = (inputCode: string) => {
         }
       });
 
-      // Handles `index.js` file file.
+      /**
+       * Handles `index.js` file file.
+       */
       build.onLoad({ filter: /(^index\.js$)/ }, () => {
         return {
           loader: 'jsx',
@@ -34,7 +36,9 @@ export const fetchPlugin = (inputCode: string) => {
         };
       });
 
-      // Handles `.css` files.
+      /*
+       * Handles `.css` files.
+       */
       build.onLoad({ filter: /.css$/ }, async (args: esbuild.OnLoadArgs) => {
         // If not, fetch the file from unpkg.
         const { data, request } = await axios.get(args.path);
@@ -66,7 +70,9 @@ export const fetchPlugin = (inputCode: string) => {
         return result;
       });
 
-      // Handles other files.
+      /*
+       * Handles other files.
+       */
       build.onLoad({ filter: /.*/ }, async (args: esbuild.OnLoadArgs) => {
         // If not, fetch the file from unpkg.
         const { data, request } = await axios.get(args.path);
