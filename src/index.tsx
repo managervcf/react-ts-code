@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { fetchPlugin, unpkgPathPlugin } from './plugins';
 
 const App = () => {
-  const ref = useRef<any>();
+  const ref = useRef<esbuild.Service | null>(null);
+  const iframe = useRef<HTMLIFrameElement | null>(null);
   const [input, setInput] = useState('');
   const [code, setCode] = useState('');
 
@@ -36,14 +37,25 @@ const App = () => {
     });
 
     const outputCode = result.outputFiles[0].text;
-    setCode(outputCode);
 
-    try {
-      eval(outputCode);
-    } catch (error) {
-      console.log(error);
-    }
+    // setCode(outputCode);
+    // Post an indirect message to the iframe that executes the received code
+    iframe.current?.contentWindow?.postMessage(outputCode, '*');
   };
+
+  const html = `
+   <html>
+    <head></head>
+    <body>
+      <div id="root"></div>
+      <script>
+        window.addEventListener('message', event => {
+          eval(event.data);
+        }, false);
+      </script>
+    </body>
+   </html>
+  `;
 
   return (
     <div>
@@ -55,8 +67,8 @@ const App = () => {
       <div>
         <button onClick={onClick}>Submit</button>
       </div>
-      <pre>{code}</pre>
-      <iframe src="/test.html" sandbox=""></iframe>
+      <code>{code}</code>
+      <iframe ref={iframe} srcDoc={html} sandbox="allow-scripts"></iframe>
     </div>
   );
 };
