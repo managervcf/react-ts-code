@@ -7,7 +7,7 @@ let service: esbuild.Service;
 /**
  * Starts the esbuild service, bundles and transpiles the `rawCode`.
  */
-export const bundleCode = async (rawCode: string): Promise<string> => {
+export const bundle = async (rawCode: string): Promise<string> => {
   // Check if the service has been initialized.
   if (!service) {
     // If not, initialize a new esbuild service.

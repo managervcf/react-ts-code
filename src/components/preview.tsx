@@ -1,31 +1,10 @@
+import './preview.css';
 import { useEffect, useRef } from 'react';
+import { iframeHtml } from '../templates';
 
 interface PreviewProps {
   code: string;
 }
-
-/**
- * HTML template for the iframe element.
- */
-const html = /*html*/ `
-   <html>
-    <head></head>
-    <body>
-      <div id="root"></div>
-      <script>
-        window.addEventListener('message', async event => {
-          try {
-            await eval(event.data);
-          } catch (error) {
-            const root = document.querySelector('#root');
-            root.innerHTML = '<div style="color: red;"><h4>Runtime Error</h4>' + error + '</div>';
-            console.log(error);
-          }
-        }, false);
-      </script>
-    </body>
-   </html>
-  `;
 
 export const Preview: React.FC<PreviewProps> = ({ code }) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -33,8 +12,7 @@ export const Preview: React.FC<PreviewProps> = ({ code }) => {
   useEffect(() => {
     if (iframeRef?.current) {
       // Reset the contents of the iframe.
-      iframeRef.current.srcdoc = html;
-
+      iframeRef.current.srcdoc = iframeHtml;
       // Post a message to the iframe that will execute the received code.
       iframeRef.current.contentWindow?.postMessage(code, '*');
     }
@@ -43,7 +21,7 @@ export const Preview: React.FC<PreviewProps> = ({ code }) => {
   return (
     <iframe
       ref={iframeRef}
-      srcDoc={html}
+      srcDoc={iframeHtml}
       title="preview"
       sandbox="allow-scripts"
     />

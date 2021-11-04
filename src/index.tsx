@@ -3,10 +3,9 @@ import ReactDOM from 'react-dom';
 import { CodeCell } from './components/code-cell';
 
 const App = () => (
-  <div>
+  <>
     <CodeCell />
-    <CodeCell />
-  </div>
+  </>
 );
 
 // Render the App component on the screen.

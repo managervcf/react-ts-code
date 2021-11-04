@@ -82,7 +82,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       <Editor
         value={initialValue}
         editorDidMount={onEditorDidMount}
-        height="500px"
+        height="100%"
         language="javascript"
         theme="dark"
         options={{
